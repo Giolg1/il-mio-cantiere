@@ -93,7 +93,7 @@ var state=JSON.parse(JSON.stringify(SEED));
 try{var l=localStorage.getItem(KEY);if(l)state=JSON.parse(l)}catch(e){}
 if(!state.prev)state.prev=SEED.prev;
 if(!state.computi)state.computi=[];
-var db=null,timer=null,filt='all';
+var db=null,timer=null,filt='all',filtF='all';
 var MESI=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function ml(ym){return ym?MESI[+ym.slice(5,7)-1]+' '+ym.slice(2,4):'—'}
@@ -271,10 +271,10 @@ function renderF(){
  document.getElementById('addf').onclick=function(){state.fasi.push({id:uid(),nome:'Nuova fase',perc:0,inizio:'',fine:'',budget:0});save();renderAll()};
 }
 function renderS(){
- var list=state.spese.filter(function(s){return filt==='all'||(filt==='p'?s.pagata:!s.pagata)}).sort(function(a,b){return (a.data||'').localeCompare(b.data||'')});
+ var list=state.spese.filter(function(s){return (filt==='all'||(filt==='p'?s.pagata:!s.pagata))&&(filtF==='all'||(filtF==='none'?!s.fase:s.fase===filtF))}).sort(function(a,b){return (a.data||'').localeCompare(b.data||'')});
  var opts=function(sel){return '<option value="">—</option>'+state.fasi.map(function(f){return '<option value="'+f.id+'"'+(f.id===sel?' selected':'')+'>'+esc(f.nome)+'</option>'}).join('')};
  var seg=function(k,t){return '<button class="btn'+(filt===k?' pri':'')+'" data-f="'+k+'">'+t+'</button>'};
- var h='<div class="card scroll"><div class="seg">'+seg('all','Tutte')+seg('p','Pagate')+seg('d','Previste')+'</div><table><tr><th style="width:140px">Data</th><th>Fase</th><th>Voce / fornitore</th><th style="min-width:200px">Dettagli</th><th style="width:120px">Importo (€)</th><th>Pagata</th><th></th></tr>';
+ var h='<div class="card scroll"><div class="seg">'+seg('all','Tutte')+seg('p','Pagate')+seg('d','Previste')+'<select id="ff" style="width:auto;margin-left:8px"><option value="all">Tutte le fasi</option>'+state.fasi.map(function(f){return '<option value="'+f.id+'"'+(f.id===filtF?' selected':'')+'>'+esc(f.nome)+'</option>'}).join('')+'<option value="none"'+(filtF==='none'?' selected':'')+'>Senza fase</option></select></div><table><tr><th style="width:140px">Data</th><th>Fase</th><th>Voce / fornitore</th><th style="min-width:200px">Dettagli</th><th style="width:120px">Importo (€)</th><th>Pagata</th><th></th></tr>';
  list.forEach(function(s){
   h+='<tr data-id="'+s.id+'"><td><input type="date" data-k="data" value="'+esc(s.data)+'"></td>'+
   '<td><select data-k="fase">'+opts(s.fase)+'</select></td>'+
@@ -284,15 +284,16 @@ function renderS(){
   '<td><input type="checkbox" data-k="pagata"'+(s.pagata?' checked':'')+'></td>'+
   '<td><button class="x" data-del="'+s.id+'" title="Elimina">×</button></td></tr>';
  });
- h+='</table><p><button class="btn pri" id="adds">+ Aggiungi spesa</button> <span class="sub">Pagato: <b>'+fmt.format(pagato())+'</b> · Previsto: <b>'+fmt.format(stima()-pagato())+'</b> · Totale: <b>'+fmt.format(stima())+'</b></span></p></div>';
+ h+='</table><p><button class="btn pri" id="adds">+ Aggiungi spesa</button> <span class="sub">'+((filt!=='all'||filtF!=='all')?'Selezione ('+list.length+'): <b>'+fmt.format(sum(list,function(s){return s.importo}))+'</b> · ':'')+'Pagato: <b>'+fmt.format(pagato())+'</b> · Previsto: <b>'+fmt.format(stima()-pagato())+'</b> · Totale: <b>'+fmt.format(stima())+'</b></span></p></div>';
  var el=document.getElementById('s');el.innerHTML=h;
+ document.getElementById('ff').onchange=function(e){filtF=e.target.value;renderS()};
  el.querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){filt=b.dataset.f;renderS()}});
  el.querySelectorAll('tr[data-id] [data-k]').forEach(function(i){i.onchange=function(){
   var s=state.spese.find(function(x){return x.id===i.closest('tr').dataset.id});
   s[i.dataset.k]=i.type==='checkbox'?i.checked:i.type==='number'?+i.value:i.value;save();renderAll()}});
  el.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){
   ask('Eliminare questa spesa?',function(){state.spese=state.spese.filter(function(x){return x.id!==b.dataset.del});save();renderAll()})}});
- document.getElementById('adds').onclick=function(){state.spese.push({id:uid(),data:new Date().toISOString().slice(0,10),fase:'',voce:'',dettagli:'',importo:0,pagata:false});save();renderAll()};
+ document.getElementById('adds').onclick=function(){state.spese.push({id:uid(),data:new Date().toISOString().slice(0,10),fase:(filtF!=='all'&&filtF!=='none'?filtF:''),voce:'',dettagli:'',importo:0,pagata:false});save();renderAll()};
 }
 function renderE(){
  var list=state.entrate.slice().sort(function(a,b){return (a.data||'').localeCompare(b.data||'')});
