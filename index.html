@@ -188,50 +188,40 @@ function tabExcel(S){
  var cells=function(list){var by={};list.forEach(function(s){var k=(s.data||'').slice(0,7);(by[k]=by[k]||[]).push(s)});
   return ms.map(function(k){var a=by[k];if(!a)return '<td class="m"></td>';var p=a.every(function(s){return s.pagata});return '<td class="m '+(p?'cp':'cd')+'">'+nn(sum(a,function(s){return s.importo}))+'</td>'}).join('')};
  var arr=function(v,neg){return ms.map(function(k,i){var x=v[i];return '<td class="m'+(neg&&x<0?' neg':'')+'">'+nn(x)+'</td>'}).join('')};
- var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px"><div class="k">Piano economico · clicca su una fase per aprire/chiudere le spese</div><div><button class="btn" id="xl">◀</button> <button class="btn" id="xr">▶</button></div></div><div class="xs" id="xs"><table class="xt"><tr><th>Voce</th><th>Avanz.</th><th>Computo</th><th>Pianificato</th><th>Pagato</th>'+ms.map(function(k){return '<th class="m'+(k===now?' now':'')+'">'+ml(k)+'</th>'}).join('')+'</tr>';
+ var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px"><div class="k">Piano economico · clicca su una fase per aprire/chiudere le spese</div><div><button class="btn" id="xl">◀</button> <button class="btn" id="xr">▶</button></div></div><div class="xs" id="xs"><table class="xt"><tr><th>Voce</th><th>Lavori %</th><th>Pagato %</th><th>Computo</th><th>Previsione</th><th>Pagato</th>'+ms.map(function(k){return '<th class="m'+(k===now?' now':'')+'">'+ml(k)+'</th>'}).join('')+'</tr>';
  state.fasi.forEach(function(f){
   var L=state.spese.filter(function(s){return s.fase===f.id}),op=opened[f.id]!==false;
-  h+='<tr class="fr" data-open="'+f.id+'"><td>'+(op?'▾ ':'▸ ')+esc(f.nome)+'</td><td>'+(+f.perc||0)+'%</td><td>'+nn(computoFase(f.id))+'</td><td>'+nn(faseTot(f.id))+'</td><td>'+nn(fasePag(f.id))+'</td>'+cells(L)+'</tr>';
+  h+='<tr class="fr" data-open="'+f.id+'"><td>'+(op?'▾ ':'▸ ')+esc(f.nome)+'</td><td>'+(+f.perc||0)+'%</td><td>'+Math.round(pctOf(fasePag(f.id),faseTot(f.id)))+'%</td><td>'+nn(computoFase(f.id))+'</td><td>'+nn(faseTot(f.id))+'</td><td>'+nn(fasePag(f.id))+'</td>'+cells(L)+'</tr>';
   if(!op)return;
   var voci=[];L.forEach(function(s){if(voci.indexOf(s.voce)<0)voci.push(s.voce)});
   voci.forEach(function(v){
    var VL=L.filter(function(s){return s.voce===v}),pr=state.prev&&state.prev[f.id+'|'+v];
-   h+='<tr class="vr"><td>'+esc(v||'(senza nome)')+'</td><td></td><td>'+nn(computoVoce(f.id,v))+'</td><td>'+nn(sum(VL,function(s){return s.importo}))+'</td><td>'+nn(sum(VL.filter(function(s){return s.pagata}),function(s){return s.importo}))+'</td>'+cells(VL)+'</tr>';
+   h+='<tr class="vr"><td>'+esc(v||'(senza nome)')+'</td><td></td><td></td><td>'+nn(computoVoce(f.id,v))+'</td><td>'+nn(sum(VL,function(s){return s.importo}))+'</td><td>'+nn(sum(VL.filter(function(s){return s.pagata}),function(s){return s.importo}))+'</td>'+cells(VL)+'</tr>';
   });
  });
  if(S){
   var us=S.pg.map(function(v,i){return v+S.pl[i]}),fl=S.en.map(function(v,i){return v-us[i]});
-  h+='<tr class="tr"><td>Totale uscite</td><td></td><td>'+nn(computoTot())+'</td><td>'+nn(stima())+'</td><td>'+nn(pagato())+'</td>'+arr(us)+'</tr>'+
-  '<tr class="tr"><td>Entrate</td><td></td><td></td><td>'+nn(sum(state.entrate,function(e){return e.importo}))+'</td><td></td>'+arr(S.en)+'</tr>'+
-  '<tr class="vr"><td>Flusso di cassa</td><td></td><td></td><td></td><td></td>'+arr(fl,1)+'</tr>'+
-  '<tr class="vr"><td>Disponibilità residua</td><td></td><td></td><td></td><td></td>'+arr(S.bal,1)+'</tr>';
+  h+='<tr class="tr"><td>Totale uscite</td><td>'+Math.round(avanz())+'%</td><td>'+Math.round(pctOf(pagato(),stima()))+'%</td><td>'+nn(computoTot())+'</td><td>'+nn(stima())+'</td><td>'+nn(pagato())+'</td>'+arr(us)+'</tr>'+
+  '<tr class="tr"><td>Entrate</td><td></td><td></td><td></td><td>'+nn(sum(state.entrate,function(e){return e.importo}))+'</td><td></td>'+arr(S.en)+'</tr>'+
+  '<tr class="vr"><td>Flusso di cassa</td><td></td><td></td><td></td><td></td><td></td>'+arr(fl,1)+'</tr>'+
+  '<tr class="vr"><td>Disponibilità residua</td><td></td><td></td><td></td><td></td><td></td>'+arr(S.bal,1)+'</tr>';
  }
  return h+'</table></div></div>';
 }
-var RIS=0.02,MQ=191.23;
+var MQ=191.23;
 function kcard(k,v,sub,cls){return '<div class="card"><div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="sub">'+sub+'</div></div>'}
 function kpiExtra(S){
- var oggi=new Date().toISOString().slice(0,10),ym=oggi.slice(0,7),E=stima(),P=pagato();
- var ex=state.fasi.filter(function(f){return /^(terreno|esterno)/i.test(f.nome)}).map(function(f){return f.id});
+ var E=stima(),ex=state.fasi.filter(function(f){return /^(terreno|esterno)/i.test(f.nome)}).map(function(f){return f.id});
  var base=sum(state.spese.filter(function(s){return ex.indexOf(s.fase)<0}),function(s){return s.importo});
- var res=(E-P)*RIS,cov='—',covSub='';
- if(S){var i=S.ms.indexOf(ym);if(i>=0){
-  var disp=S.bal[i],nx=S.ms.slice(i+1,i+7),tot=0;
-  nx.forEach(function(k,j){tot+=S.pg[i+1+j]+S.pl[i+1+j]});
-  var avg=nx.length?tot/nx.length:0;
-  if(avg>0)cov=Math.max(0,disp/avg).toFixed(1).replace('.',',');
-  covSub='disponibilità '+fmt.format(disp)+' · uscita media '+fmt.format(avg)+'/mese (prossimi 6 mesi)';
-  for(var j=i+1;j<S.ms.length;j++){if(S.bal[j]<0){covSub+=' · in rosso da '+ml(S.ms[j]);break}}
- }}
- var EV=sum(state.fasi,function(f){return (+f.perc||0)/100*faseTot(f.id)});
- var PV=sum(state.spese.filter(function(s){return s.data&&s.data<=oggi}),function(s){return s.importo});
- var cpi=P>0?EV/P:null,spi=PV>0?EV/PV:null;
- var col=function(v){return v==null?'':v<0.95?'neg':v<1?'t1':'t2'};
- var nf=function(v){return v==null?'—':v.toFixed(2).replace('.',',')};
- var eac=cpi?P+(E-EV)/cpi:null;
- return kcard('Costo al mq',fmt.format(base/MQ),'senza terreno ed esterno · totale '+fmt.format(E/MQ)+'/mq ('+String(MQ).replace('.',',')+' mq)')+
-  kcard('CPI (efficienza costi)',nf(cpi),'valore maturato '+fmt.format(EV)+' · pagato '+fmt.format(P)+(eac?' · EAC '+fmt.format(eac):''),col(cpi))+
-  kcard('SPI (rispetto al piano)',nf(spi),'previsto a oggi '+fmt.format(PV),col(spi))+computoKpi(E);
+ return kcard('Costo al mq',fmt.format(base/MQ),'senza terreno ed esterno · totale '+fmt.format(E/MQ)+'/mq ('+String(MQ).replace('.',',')+' mq)')+computoKpi(E);
+}
+function cmpCard(A,P,E){
+ var PP=pctOf(P,E),d=PP-A;
+ var msg=Math.abs(d)<1?'pagato in linea con i lavori':d>0?'pagato '+d.toFixed(0)+' punti in più dei lavori fatti':'lavori avanti di '+(-d).toFixed(0)+' punti rispetto al pagato';
+ return '<div class="card"><div class="k">Avanzamento lavori e pagato</div>'+
+ '<div class="v">'+A.toFixed(0)+'% <span class="sub">lavori</span></div><div class="bar" style="margin-top:6px"><i style="width:'+A+'%"></i></div>'+
+ '<div class="v" style="font-size:16px;margin-top:10px">'+PP.toFixed(0)+'% <span class="sub">pagato</span></div><div class="bar sp" style="margin-top:4px"><i style="width:'+PP+'%"></i></div>'+
+ '<div class="sub'+(d>5?' neg':'')+'" style="margin-top:6px">'+msg+'</div></div>';
 }
 function renderP(){
  var P=pagato(),E=stima(),A=avanz(),S=series();
@@ -239,7 +229,7 @@ function renderP(){
  var minBal=S?Math.min.apply(null,S.bal):0,mi=S?S.bal.indexOf(minBal):0;
  
  var h='<div class="grid">'+
- '<div class="card"><div class="k">Avanzamento lavori</div><div class="v">'+A.toFixed(0)+'%</div><div class="bar" style="margin-top:8px"><i style="width:'+A+'%"></i></div></div>'+
+ cmpCard(A,P,E)+
  '<div class="card"><div class="k">Pagato finora</div><div class="v">'+fmt.format(P)+'</div><div class="bar sp" style="margin-top:8px"><i style="width:'+pctOf(P,E)+'%"></i></div><div class="sub">'+pctOf(P,E).toFixed(0)+'% della stima finale</div></div>'+
  '<div class="card"><div class="k">Ancora da pagare</div><div class="v">'+fmt.format(E-P)+'</div></div>'+
  '<div class="card"><div class="k">Stima costo finale</div><div class="v">'+fmt.format(E)+'</div><div class="sub">pagato + previsto</div></div>'+
