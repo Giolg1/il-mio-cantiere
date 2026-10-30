@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il mio cantiere</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f4ef;--card:#fff;--tx:#1f2328;--mut:#6b7280;--bd:#e3dfd6;--ac:#c2571a;--ok:#2f855a;--warn:#b7791f;--bad:#c53030;--bar:#ece8df}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#16181b;--card:#1f2327;--tx:#e8e8e6;--mut:#9aa0a6;--bd:#33383d;--ac:#f08a4b;--ok:#48bb78;--warn:#ecc94b;--bad:#fc8181;--bar:#2b3035}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#16181b;--card:#1f2327;--tx:#e8e8e6;--mut:#9aa0a6;--bd:#33383d;--ac:#f08a4b;--ok:#48bb78;--warn:#ecc94b;--bad:#fc8181;--bar:#2b3035}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:0}
+.sub{color:var(--mut);font-size:13px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+nav{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap}
+nav button,.btn{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:8px;cursor:pointer;font:inherit}
+nav button.on,.btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+.grid .card{margin:0}
+.k{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.v{font-size:22px;font-weight:650;margin-top:2px}
+.bar{height:10px;background:var(--bar);border-radius:6px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ac);border-radius:6px}
+.bar.sp>i{background:var(--ok)}
+.row{display:grid;grid-template-columns:1.4fr 1.6fr 1.6fr;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--bd)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{text-align:left;font-size:12px;color:var(--mut);font-weight:500;padding:6px 4px}
+td{padding:4px;border-top:1px solid var(--bd)}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:5px 7px;width:100%;min-width:0}
+input[type=checkbox]{width:auto}
+input[type=range]{padding:0}
+.x{background:none;border:none;color:var(--bad);cursor:pointer;font-size:18px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--bd);white-space:nowrap}
+.t0{color:var(--mut)}.t1{color:var(--warn)}.t2{color:var(--ok)}
+.neg{color:var(--bad)}
+.hide{display:none}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.ov .bx{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:18px;max-width:360px}
+.ov .bx p{margin:0 0 14px}
+.ov .bx div{display:flex;gap:8px;justify-content:flex-end}
+.seg{display:inline-flex;gap:4px;margin-bottom:8px}
+.seg button{padding:4px 10px;font-size:13px}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--mut);font-size:10px}
+.leg{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-top:4px;flex-wrap:wrap}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.xt{width:max-content;min-width:100%;font-size:12px}
+.xs{overflow:auto;max-height:75vh;-webkit-overflow-scrolling:touch}
+.xt th,.xt td{padding:3px 6px;white-space:nowrap;text-align:right}
+.xt th:first-child,.xt td:first-child{text-align:left;position:sticky;left:0;background:var(--card);z-index:1;min-width:190px}
+.xt .fr td{background:var(--bar);font-weight:650;cursor:pointer}
+.xt .fr td:first-child{background:var(--bar)}
+.xt .vr td:first-child{padding-left:22px;font-weight:400}
+.xt .tr td{font-weight:650;border-top:2px solid var(--bd)}
+.xt .m{min-width:54px;color:var(--tx)}
+.xt th.now{color:var(--ac)}
+.xt td.cp{background:color-mix(in srgb,var(--ok) 22%,transparent)}
+.xt td.cd{background:color-mix(in srgb,var(--ac) 20%,transparent)}
+@media (max-width:600px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div><h1>🏠 Il mio cantiere</h1><div class="sub" id="sync">Caricamento…</div></div>
+ <div><button class="btn" id="exp">Esporta CSV</button> <button class="btn" id="rst">Ripristina dati Excel</button></div>
+</header>
+<nav>
+ <button data-t="p" class="on">Panoramica</button>
+ <button data-t="f">Fasi</button>
+ <button data-t="c">Computi metrici</button>
+ <button data-t="s">Spese</button>
+ <button data-t="e">Entrate</button>
+</nav>
+<section id="p"></section>
+<section id="f" class="hide"></section>
+<section id="c" class="hide"></section>
+<section id="s" class="hide"></section>
+<section id="e" class="hide"></section>
+</main>
+<script>
+var SEED={"budget":0,"oggi":"2026-10-30","fasi":[{"id":"f0","nome":"Terreno","budget":79930,"inizio":"2021-10-01","fine":"2022-05-01","perc":100},{"id":"f1","nome":"Progetto","budget":9700,"inizio":"2023-11-01","fine":"2027-12-01","perc":35},{"id":"f2","nome":"Tasse costruzione/autorizzazioni","budget":17000,"inizio":"2024-10-01","fine":"2028-08-01","perc":20},{"id":"f3","nome":"Struttura","budget":96000,"inizio":"2027-01-01","fine":"2027-06-01","perc":0},{"id":"f4","nome":"Esterno","budget":37825,"inizio":"2022-11-01","fine":"2028-02-01","perc":50},{"id":"f5","nome":"Involucro verticale e interno","budget":136072,"inizio":"2027-09-01","fine":"2028-05-01","perc":0},{"id":"f6","nome":"Impianti","budget":55000,"inizio":"2028-02-01","fine":"2028-02-01","perc":0}],"spese":[{"id":"s1","data":"2021-10-01","fase":"f0","voce":"Aquisto","importo":15000,"pagata":true},{"id":"s2","data":"2022-05-01","fase":"f0","voce":"Aquisto","importo":55000,"pagata":true},{"id":"s3","data":"2022-01-01","fase":"f0","voce":"Frazionamento","importo":315,"pagata":true},{"id":"s4","data":"2022-05-01","fase":"f0","voce":"Frazionamento","importo":315,"pagata":true},{"id":"s5","data":"2022-05-01","fase":"f0","voce":"Imposte","importo":7700,"pagata":true},{"id":"s6","data":"2022-05-01","fase":"f0","voce":"Notaio","importo":1600,"pagata":true},{"id":"s7","data":"2023-11-01","fase":"f1","voce":"Architetto","importo":626,"pagata":true},{"id":"s8","data":"2024-02-01","fase":"f1","voce":"Architetto","importo":500,"pagata":true},{"id":"s9","data":"2027-10-01","fase":"f1","voce":"Architetto","importo":2000,"pagata":false},{"id":"s10","data":"2026-05-01","fase":"f1","voce":"Strutturista","importo":700,"pagata":true},{"id":"s11","data":"2027-12-01","fase":"f1","voce":"Collaudatore statico","importo":700,"pagata":false},{"id":"s12","data":"2026-03-01","fase":"f1","voce":"Geometra","importo":200,"pagata":true},{"id":"s13","data":"2026-12-01","fase":"f1","voce":"Geometra","importo":1000,"pagata":false},{"id":"s14","data":"2025-12-01","fase":"f1","voce":"Geologo","importo":730,"pagata":true},{"id":"s15","data":"2026-12-01","fase":"f1","voce":"Geologo","importo":300,"pagata":false},{"id":"s16","data":"2027-06-01","fase":"f1","voce":"Altro professionista","importo":1000,"pagata":false},{"id":"s17","data":"2024-10-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":151.65,"pagata":true},{"id":"s18","data":"2025-12-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":232,"pagata":true},{"id":"s19","data":"2026-03-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":67,"pagata":true},{"id":"s20","data":"2026-06-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":35,"pagata":true},{"id":"s21","data":"2026-10-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":2399.79,"pagata":true},{"id":"s22","data":"2027-04-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":2383.79,"pagata":false},{"id":"s23","data":"2027-10-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":2383.79,"pagata":false},{"id":"s24","data":"2028-04-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":2383.79,"pagata":false},{"id":"s25","data":"2028-08-01","fase":"f2","voce":"Tasse costruzione/autorizzazioni","importo":2383.79,"pagata":false},{"id":"s26","data":"2027-05-01","fase":"f2","voce":"Altro","importo":2000,"pagata":false},{"id":"s27","data":"2027-01-01","fase":"f3","voce":"Scavo","importo":6000,"pagata":false},{"id":"s28","data":"2027-02-01","fase":"f3","voce":"Fondazioni","importo":40000,"pagata":false},{"id":"s29","data":"2027-04-01","fase":"f3","voce":"Pilastri","importo":20000,"pagata":false},{"id":"s30","data":"2027-06-01","fase":"f3","voce":"Solaio","importo":30000,"pagata":false},{"id":"s31","data":"2022-11-01","fase":"f4","voce":"Recinzione paletti","importo":3440,"pagata":true},{"id":"s32","data":"2027-02-01","fase":"f4","voce":"Recinzione muro","importo":5000,"pagata":false},{"id":"s33","data":"2027-05-01","fase":"f4","voce":"Recinzione muro","importo":5000,"pagata":false},{"id":"s34","data":"2023-08-01","fase":"f4","voce":"Bonifica terreno","importo":600,"pagata":true},{"id":"s35","data":"2024-11-01","fase":"f4","voce":"Bonifica terreno","importo":6700,"pagata":true},{"id":"s36","data":"2025-01-01","fase":"f4","voce":"Pozzo acqua","importo":1950,"pagata":true},{"id":"s37","data":"2024-12-01","fase":"f4","voce":"Uliveto","importo":1075,"pagata":true},{"id":"s38","data":"2024-12-01","fase":"f4","voce":"Piantumazione + imp. Irrigaz.","importo":700,"pagata":true},{"id":"s39","data":"2025-04-01","fase":"f4","voce":"Piantumazione + imp. Irrigaz.","importo":700,"pagata":true},{"id":"s40","data":"2028-02-01","fase":"f4","voce":"Siepe / alberi","importo":5000,"pagata":false},{"id":"s41","data":"2027-09-01","fase":"f5","voce":"Tompagnamento grezzo","importo":20000,"pagata":false},{"id":"s42","data":"2028-05-01","fase":"f5","voce":"Tompagnamento finito","importo":21000,"pagata":false},{"id":"s43","data":"2027-12-01","fase":"f5","voce":"Infissi esterni","importo":40000,"pagata":false},{"id":"s44","data":"2027-11-01","fase":"f5","voce":"Tramezzatura","importo":17000,"pagata":false},{"id":"s45","data":"2027-12-01","fase":"f5","voce":"Porte interne","importo":6000,"pagata":false},{"id":"s46","data":"2027-12-01","fase":"f5","voce":"Massetto e piastrellatura","importo":11000,"pagata":false},{"id":"s47","data":"2028-01-01","fase":"f5","voce":"Battiscopa","importo":2000,"pagata":false},{"id":"s48","data":"2028-01-01","fase":"f5","voce":"Bagni","importo":10000,"pagata":false},{"id":"s49","data":"2028-02-01","fase":"f5","voce":"Altro","importo":5000,"pagata":false},{"id":"s50","data":"2028-02-01","fase":"f6","voce":"Elettrico","importo":12000,"pagata":false},{"id":"s51","data":"2028-02-01","fase":"f6","voce":"idrico","importo":8000,"pagata":false},{"id":"s52","data":"2028-02-01","fase":"f6","voce":"Riscaldamento","importo":15000,"pagata":false},{"id":"s53","data":"2028-02-01","fase":"f6","voce":"Fossa settica","importo":5000,"pagata":false},{"id":"s54","data":"2028-02-01","fase":"f6","voce":"FV + Solare termico","importo":15000,"pagata":false}],"entrate":[{"id":"e0","data":"2021-10-01","fonte":"Anto","importo":15000},{"id":"e1","data":"2022-03-01","fonte":"Anto","importo":10000},{"id":"e2","data":"2022-04-01","fonte":"Anto","importo":2500},{"id":"e3","data":"2022-05-01","fonte":"Anto","importo":10000},{"id":"e4","data":"2022-06-01","fonte":"Anto","importo":1000},{"id":"e5","data":"2022-11-01","fonte":"Anto","importo":1000},{"id":"e6","data":"2023-01-01","fonte":"Anto","importo":500},{"id":"e7","data":"2024-09-01","fonte":"Anto","importo":500},{"id":"e8","data":"2024-10-01","fonte":"Anto","importo":3000},{"id":"e9","data":"2024-12-01","fonte":"Anto","importo":500},{"id":"e10","data":"2025-01-01","fonte":"Anto","importo":15500},{"id":"e11","data":"2021-10-01","fonte":"Gio","importo":31400},{"id":"e12","data":"2021-11-01","fonte":"Gio","importo":1400},{"id":"e13","data":"2021-12-01","fonte":"Gio","importo":1300},{"id":"e14","data":"2022-02-01","fonte":"Gio","importo":1400},{"id":"e15","data":"2022-03-01","fonte":"Gio","importo":500},{"id":"e16","data":"2022-05-01","fonte":"Gio","importo":7500},{"id":"e17","data":"2022-06-01","fonte":"Gio","importo":1000},{"id":"e18","data":"2022-10-01","fonte":"Gio","importo":500},{"id":"e19","data":"2022-11-01","fonte":"Gio","importo":1500},{"id":"e20","data":"2022-12-01","fonte":"Gio","importo":500},{"id":"e21","data":"2023-01-01","fonte":"Gio","importo":500},{"id":"e22","data":"2024-09-01","fonte":"Gio","importo":3500},{"id":"e23","data":"2024-10-01","fonte":"Gio","importo":3000},{"id":"e24","data":"2024-12-01","fonte":"Gio","importo":500},{"id":"e25","data":"2025-01-01","fonte":"Gio","importo":15500},{"id":"e26","data":"2025-11-01","fonte":"Gio","importo":1000},{"id":"e27","data":"2025-12-01","fonte":"Gio","importo":1000},{"id":"e28","data":"2026-02-01","fonte":"Gio","importo":42000},{"id":"e29","data":"2026-10-01","fonte":"Gio","importo":8000},{"id":"e30","data":"2027-03-01","fonte":"Mutuo","importo":60000},{"id":"e31","data":"2027-10-01","fonte":"Mutuo","importo":60000}],"prev":{"f0|Aquisto":70000,"f0|Frazionamento":630,"f0|Imposte":7700,"f0|Notaio":1600,"f1|Architetto":3500,"f1|Strutturista":1500,"f1|Collaudatore statico":700,"f1|Geometra":1500,"f1|Geologo":1000,"f1|Altro professionista":1500,"f2|Tasse costruzione/autorizzazioni":15000,"f2|Altro":2000,"f3|Scavo":6000,"f3|Fondazioni":40000,"f3|Pilastri":20000,"f3|Solaio":30000,"f4|Recinzione paletti":3500,"f4|Recinzione muro":16800,"f4|Bonifica terreno":8000,"f4|Pozzo acqua":2100,"f4|Uliveto":1105,"f4|Piantumazione + imp. Irrigaz.":1320,"f4|Siepe / alberi":5000,"f5|Tompagnamento grezzo":18792,"f5|Tompagnamento finito":20880,"f5|Infissi esterni":39000,"f5|Tramezzatura":16800,"f5|Porte interne":6000,"f5|Massetto e piastrellatura":17600,"f5|Battiscopa":2000,"f5|Bagni":10000,"f5|Altro":5000,"f6|Elettrico":12000,"f6|idrico":8000,"f6|Riscaldamento":15000,"f6|Fossa settica":5000,"f6|FV + Solare termico":15000}};
+var KEY='cantiere-v2',DOC='cantiere/stato2';
+var fmt=new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:0,useGrouping:'always'});
+var uid=function(){return Math.random().toString(36).slice(2,9)};
+var state=JSON.parse(JSON.stringify(SEED));
+try{var l=localStorage.getItem(KEY);if(l)state=JSON.parse(l)}catch(e){}
+if(!state.prev)state.prev=SEED.prev;
+if(!state.computi)state.computi=[];
+var db=null,timer=null,filt='all';
+var MESI=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function ml(ym){return ym?MESI[+ym.slice(5,7)-1]+' '+ym.slice(2,4):'—'}
+function setSync(t){document.getElementById('sync').textContent=t}
+function ask(msg,ok){
+ var o=document.createElement('div');o.className='ov';
+ o.innerHTML='<div class="bx"><p></p><div><button class="btn" id="no">Annulla</button><button class="btn pri" id="si">Conferma</button></div></div>';
+ o.querySelector('p').textContent=msg;
+ document.body.appendChild(o);
+ o.querySelector('#no').onclick=function(){o.remove()};
+ o.querySelector('#si').onclick=function(){o.remove();ok()};
+}
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+ clearTimeout(timer);
+ timer=setTimeout(async function(){
+  if(!db){setSync('Salvato solo su questo dispositivo');return}
+  try{await db.doc(DOC).set(state);setSync('Salvato e sincronizzato')}catch(e){setSync('Salvato localmente (sync non riuscita)')}
+ },500);
+}
+function sum(a,f){return a.reduce(function(t,x){return t+(+f(x)||0)},0)}
+function stima(){return sum(state.spese,function(s){return s.importo})}
+function pagato(){return sum(state.spese.filter(function(s){return s.pagata}),function(s){return s.importo})}
+function fasePag(id){return sum(state.spese.filter(function(s){return s.fase===id&&s.pagata}),function(s){return s.importo})}
+function faseTot(id){return sum(state.spese.filter(function(s){return s.fase===id}),function(s){return s.importo})}
+function budgetFasi(){return sum(state.fasi,function(f){return f.budget})}
+function avanz(){
+ var F=state.fasi,b=stima();
+ if(!F.length)return 0;
+ if(b>0)return sum(F,function(f){return (+f.perc||0)*faseTot(f.id)})/b;
+ return sum(F,function(f){return f.perc})/F.length;
+}
+function stato(p){p=+p||0;return p>=100?['Completata','t2']:p>0?['In corso','t1']:['Da iniziare','t0']}
+function faseDate(id){var d=state.spese.filter(function(s){return s.fase===id&&s.data}).map(function(s){return s.data}).sort();return d.length?{i:d[0],f:d[d.length-1]}:null}
+function fd(s){return s?s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4):'—'}
+function statoDate(D){if(!D)return['Senza spese','t0'];var o=new Date().toISOString().slice(0,10);return o<D.i?['Da iniziare','t0']:o>D.f?['Completata','t2']:['In corso','t1']}
+function pctOf(a,b){return b>0?Math.max(0,Math.min(100,a/b*100)):0}
+function series(){
+ var all=state.spese.concat(state.entrate).map(function(x){return (x.data||'').slice(0,7)}).filter(Boolean).sort();
+ if(!all.length)return null;
+ var ms=[],y=+all[0].slice(0,4),m=+all[0].slice(5,7),end=all[all.length-1];
+ while(true){var k=y+'-'+(m<10?'0':'')+m;ms.push(k);if(k>=end)break;m++;if(m>12){m=1;y++}}
+ var ix={};ms.forEach(function(k,i){ix[k]=i});
+ var pg=ms.map(function(){return 0}),pl=pg.slice(),en=pg.slice();
+ state.spese.forEach(function(s){var i=ix[(s.data||'').slice(0,7)];if(i!=null)(s.pagata?pg:pl)[i]+=+s.importo||0});
+ state.entrate.forEach(function(e){var i=ix[(e.data||'').slice(0,7)];if(i!=null)en[i]+=+e.importo||0});
+ var bal=[],c=0;ms.forEach(function(k,i){c+=en[i]-pg[i]-pl[i];bal.push(c)});
+ return{ms:ms,pg:pg,pl:pl,en:en,bal:bal};
+}
+function axis(ms,W,H,top,bot,xf){
+ var t='',now=new Date().toISOString().slice(0,7);
+ ms.forEach(function(k,i){if(k.slice(5)==='01'){t+='<line x1="'+xf(i)+'" x2="'+xf(i)+'" y1="'+top+'" y2="'+(H-bot)+'" stroke="var(--bd)" opacity=".5"/><text x="'+(xf(i)+3)+'" y="'+(H-5)+'">'+k.slice(0,4)+'</text>'}});
+ var ni=ms.indexOf(now);
+ if(ni>=0)t+='<line x1="'+xf(ni)+'" x2="'+xf(ni)+'" y1="'+top+'" y2="'+(H-bot)+'" stroke="var(--ac)" stroke-dasharray="3 3"/><text x="'+(xf(ni)+3)+'" y="'+(top+9)+'" style="fill:var(--ac)">oggi</text>';
+ return t;
+}
+function yAxis(W,L,R,lo,hi,yf){
+ var t='';
+ for(var v=lo;v<=hi;v+=25000){
+  t+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+yf(v)+'" y2="'+yf(v)+'" stroke="'+(v===0?'var(--mut)':'var(--bd)')+'"/><text x="'+(L-5)+'" y="'+(yf(v)+3)+'" text-anchor="end">'+fmtN.format(v)+'</text>';
+ }
+ return t;
+}
+function chartBars(S){
+ var W=900,H=200,L=58,R=10,top=10,bot=20,n=S.ms.length,w=(W-L-R)/n;
+ var mx=Math.max.apply(null,S.pg.map(function(v,i){return v+S.pl[i]}).concat([1]));
+ var hi=Math.ceil(mx/25000)*25000;
+ var xf=function(i){return L+i*w},yf=function(v){return H-bot-v/hi*(H-bot-top)};
+ var t=yAxis(W,L,R,0,hi,yf)+axis(S.ms,W,H,top,bot,xf);
+ S.ms.forEach(function(k,i){
+  var y0=yf(0),y1=yf(S.pg[i]),y2=yf(S.pg[i]+S.pl[i]),x=xf(i)+0.5,bw=Math.max(1.5,w-1);
+  if(S.pg[i]>0)t+='<rect x="'+x+'" y="'+y1+'" width="'+bw+'" height="'+(y0-y1)+'" fill="var(--ok)"/>';
+  if(S.pl[i]>0)t+='<rect x="'+x+'" y="'+y2+'" width="'+bw+'" height="'+(y1-y2)+'" fill="var(--ac)" opacity=".6"/>';
+ });
+ return '<svg viewBox="0 0 '+W+' '+H+'">'+t+'</svg>';
+}
+function chartBal(S){
+ var W=900,H=220,L=58,R=10,top=14,bot=20,n=S.ms.length,w=(W-L-R)/Math.max(1,n-1);
+ var lo=Math.floor(Math.min.apply(null,S.bal.concat([0]))/25000)*25000,hi=Math.ceil(Math.max.apply(null,S.bal.concat([0]))/25000)*25000;
+ if(hi<=lo)hi=lo+25000;
+ var xf=function(i){return L+i*w},yf=function(v){return top+(hi-v)/(hi-lo)*(H-bot-top)};
+ var t=yAxis(W,L,R,lo,hi,yf)+axis(S.ms,W,H,top,bot,xf);
+ t+='<polyline fill="none" stroke="var(--ac)" stroke-width="2" points="'+S.bal.map(function(v,i){return xf(i)+','+yf(v)}).join(' ')+'"/>';
+ var mi=S.bal.indexOf(Math.min.apply(null,S.bal));
+ t+='<circle cx="'+xf(mi)+'" cy="'+yf(S.bal[mi])+'" r="4" fill="var(--bad)"/><text x="'+Math.min(W-150,xf(mi)+8)+'" y="'+(yf(S.bal[mi])+14)+'" style="fill:var(--bad)">'+fmt.format(S.bal[mi])+' ('+ml(S.ms[mi])+')</text>';
+ return '<svg viewBox="0 0 '+W+' '+H+'">'+t+'</svg>';
+}
+var opened={},fmtN=new Intl.NumberFormat('it-IT',{maximumFractionDigits:0,useGrouping:'always'});
+function nn(v){return v?fmtN.format(v):''}
+function tabExcel(S){
+ var ms=S?S.ms:[],now=new Date().toISOString().slice(0,7);
+ var cells=function(list){var by={};list.forEach(function(s){var k=(s.data||'').slice(0,7);(by[k]=by[k]||[]).push(s)});
+  return ms.map(function(k){var a=by[k];if(!a)return '<td class="m"></td>';var p=a.every(function(s){return s.pagata});return '<td class="m '+(p?'cp':'cd')+'">'+nn(sum(a,function(s){return s.importo}))+'</td>'}).join('')};
+ var arr=function(v,neg){return ms.map(function(k,i){var x=v[i];return '<td class="m'+(neg&&x<0?' neg':'')+'">'+nn(x)+'</td>'}).join('')};
+ var h='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px"><div class="k">Piano economico · clicca su una fase per aprire/chiudere le spese</div><div><button class="btn" id="xl">◀</button> <button class="btn" id="xr">▶</button></div></div><div class="xs" id="xs"><table class="xt"><tr><th>Voce</th><th>Avanz.</th><th>Computo</th><th>Pianificato</th><th>Pagato</th>'+ms.map(function(k){return '<th class="m'+(k===now?' now':'')+'">'+ml(k)+'</th>'}).join('')+'</tr>';
+ state.fasi.forEach(function(f){
+  var L=state.spese.filter(function(s){return s.fase===f.id}),op=opened[f.id]!==false;
+  h+='<tr class="fr" data-open="'+f.id+'"><td>'+(op?'▾ ':'▸ ')+esc(f.nome)+'</td><td>'+(+f.perc||0)+'%</td><td>'+nn(computoFase(f.id))+'</td><td>'+nn(faseTot(f.id))+'</td><td>'+nn(fasePag(f.id))+'</td>'+cells(L)+'</tr>';
+  if(!op)return;
+  var voci=[];L.forEach(function(s){if(voci.indexOf(s.voce)<0)voci.push(s.voce)});
+  voci.forEach(function(v){
+   var VL=L.filter(function(s){return s.voce===v}),pr=state.prev&&state.prev[f.id+'|'+v];
+   h+='<tr class="vr"><td>'+esc(v||'(senza nome)')+'</td><td></td><td>'+nn(computoVoce(f.id,v))+'</td><td>'+nn(sum(VL,function(s){return s.importo}))+'</td><td>'+nn(sum(VL.filter(function(s){return s.pagata}),function(s){return s.importo}))+'</td>'+cells(VL)+'</tr>';
+  });
+ });
+ if(S){
+  var us=S.pg.map(function(v,i){return v+S.pl[i]}),fl=S.en.map(function(v,i){return v-us[i]});
+  h+='<tr class="tr"><td>Totale uscite</td><td></td><td>'+nn(computoTot())+'</td><td>'+nn(stima())+'</td><td>'+nn(pagato())+'</td>'+arr(us)+'</tr>'+
+  '<tr class="tr"><td>Entrate</td><td></td><td></td><td>'+nn(sum(state.entrate,function(e){return e.importo}))+'</td><td></td>'+arr(S.en)+'</tr>'+
+  '<tr class="vr"><td>Flusso di cassa</td><td></td><td></td><td></td><td></td>'+arr(fl,1)+'</tr>'+
+  '<tr class="vr"><td>Disponibilità residua</td><td></td><td></td><td></td><td></td>'+arr(S.bal,1)+'</tr>';
+ }
+ return h+'</table></div></div>';
+}
+var RIS=0.02,MQ=191.23;
+function kcard(k,v,sub,cls){return '<div class="card"><div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="sub">'+sub+'</div></div>'}
+function kpiExtra(S){
+ var oggi=new Date().toISOString().slice(0,10),ym=oggi.slice(0,7),E=stima(),P=pagato();
+ var ex=state.fasi.filter(function(f){return /^(terreno|esterno)/i.test(f.nome)}).map(function(f){return f.id});
+ var base=sum(state.spese.filter(function(s){return ex.indexOf(s.fase)<0}),function(s){return s.importo});
+ var res=(E-P)*RIS,cov='—',covSub='';
+ if(S){var i=S.ms.indexOf(ym);if(i>=0){
+  var disp=S.bal[i],nx=S.ms.slice(i+1,i+7),tot=0;
+  nx.forEach(function(k,j){tot+=S.pg[i+1+j]+S.pl[i+1+j]});
+  var avg=nx.length?tot/nx.length:0;
+  if(avg>0)cov=Math.max(0,disp/avg).toFixed(1).replace('.',',');
+  covSub='disponibilità '+fmt.format(disp)+' · uscita media '+fmt.format(avg)+'/mese (prossimi 6 mesi)';
+  for(var j=i+1;j<S.ms.length;j++){if(S.bal[j]<0){covSub+=' · in rosso da '+ml(S.ms[j]);break}}
+ }}
+ var EV=sum(state.fasi,function(f){return (+f.perc||0)/100*faseTot(f.id)});
+ var PV=sum(state.spese.filter(function(s){return s.data&&s.data<=oggi}),function(s){return s.importo});
+ var cpi=P>0?EV/P:null,spi=PV>0?EV/PV:null;
+ var col=function(v){return v==null?'':v<0.95?'neg':v<1?'t1':'t2'};
+ var nf=function(v){return v==null?'—':v.toFixed(2).replace('.',',')};
+ var eac=cpi?P+(E-EV)/cpi:null;
+ return kcard('Costo al mq',fmt.format(base/MQ),'senza terreno ed esterno · totale '+fmt.format(E/MQ)+'/mq ('+String(MQ).replace('.',',')+' mq)')+
+  kcard('CPI (efficienza costi)',nf(cpi),'valore maturato '+fmt.format(EV)+' · pagato '+fmt.format(P)+(eac?' · EAC '+fmt.format(eac):''),col(cpi))+
+  kcard('SPI (rispetto al piano)',nf(spi),'previsto a oggi '+fmt.format(PV),col(spi))+computoKpi(E);
+}
+function renderP(){
+ var P=pagato(),E=stima(),A=avanz(),S=series();
+ var ent=sum(state.entrate,function(e){return e.importo});
+ var minBal=S?Math.min.apply(null,S.bal):0,mi=S?S.bal.indexOf(minBal):0;
+ 
+ var h='<div class="grid">'+
+ '<div class="card"><div class="k">Avanzamento lavori</div><div class="v">'+A.toFixed(0)+'%</div><div class="bar" style="margin-top:8px"><i style="width:'+A+'%"></i></div></div>'+
+ '<div class="card"><div class="k">Pagato finora</div><div class="v">'+fmt.format(P)+'</div><div class="bar sp" style="margin-top:8px"><i style="width:'+pctOf(P,E)+'%"></i></div><div class="sub">'+pctOf(P,E).toFixed(0)+'% della stima finale</div></div>'+
+ '<div class="card"><div class="k">Ancora da pagare</div><div class="v">'+fmt.format(E-P)+'</div></div>'+
+ '<div class="card"><div class="k">Stima costo finale</div><div class="v">'+fmt.format(E)+'</div><div class="sub">pagato + previsto</div></div>'+
+ '<div class="card"><div class="k">Entrate previste</div><div class="v">'+fmt.format(ent)+'</div><div class="sub">copertura '+(E>0?(ent/E*100).toFixed(0):0)+'% del costo</div></div>'+
+ '<div class="card"><div class="k">Picco di deficit</div><div class="v '+(minBal<0?'neg':'')+'">'+fmt.format(Math.min(0,minBal))+'</div><div class="sub">'+(minBal<0?ml(S.ms[mi]):'nessun deficit')+'</div></div>'+
+ kpiExtra(S)+'</div>';
+ if(S){
+  h+='<div class="card"><div class="k" style="margin-bottom:4px">Uscite mensili</div>'+chartBars(S)+'<div class="leg"><span><i style="background:var(--ok)"></i>pagate</span><span><i style="background:var(--ac);opacity:.6"></i>previste</span></div></div>'+
+  '<div class="card"><div class="k" style="margin-bottom:4px">Disponibilità cumulata (entrate − uscite)</div>'+chartBal(S)+'</div>';
+ }
+  h+=tabExcel(S);
+ var old=document.getElementById('xs'),sl=old?old.scrollLeft:null,stp=old?old.scrollTop:0;
+ document.getElementById('p').innerHTML=h;
+ var xs=document.getElementById('xs');
+ if(xs){
+  if(sl!==null){xs.scrollLeft=sl;xs.scrollTop=stp}
+  else{var nw=xs.querySelector('th.now');if(nw)xs.scrollLeft=Math.max(0,nw.offsetLeft-420)}
+  document.getElementById('xl').onclick=function(){xs.scrollBy({left:-420,behavior:'smooth'})};
+  document.getElementById('xr').onclick=function(){xs.scrollBy({left:420,behavior:'smooth'})};
+ }
+  document.querySelectorAll('#p [data-open]').forEach(function(r){r.onclick=function(){var k=r.dataset.open;opened[k]=opened[k]===false;renderP()}});
+}
+function renderF(){
+ var h='<div class="card scroll"><table><tr><th>Fase</th><th style="width:170px">Avanzamento lavori</th><th>Inizio</th><th>Fine</th><th>Stato</th><th>Spese previste (€)</th><th></th></tr>';
+ state.fasi.forEach(function(f){
+  h+='<tr data-id="'+f.id+'"><td><input data-k="nome" value="'+esc(f.nome)+'"></td>'+
+  '<td><input type="range" data-k="perc" min="0" max="100" step="5" value="'+(+f.perc||0)+'"> <span class="sub">'+(+f.perc||0)+'%</span></td>'+
+  (function(){var D=faseDate(f.id),st=statoDate(D);return '<td>'+fd(D&&D.i)+'</td><td>'+fd(D&&D.f)+'</td><td><span class="tag '+st[1]+'">'+st[0]+'</span></td>'})()+
+  '<td>'+fmt.format(faseTot(f.id))+'</td>'+
+  '<td><button class="x" data-del="'+f.id+'" title="Elimina">×</button></td></tr>';
+ });
+ h+='<tr style="font-weight:650"><td>Totale</td><td></td><td></td><td></td><td></td><td>'+fmt.format(stima())+'</td><td></td></tr></table><p><button class="btn pri" id="addf">+ Aggiungi fase</button> <span class="sub">L’avanzamento iniziale è una stima: pagato ÷ costo previsto della fase. Correggilo con lo stato reale del cantiere.</span></p></div>';
+ var el=document.getElementById('f');el.innerHTML=h;
+ el.querySelectorAll('tr[data-id] input').forEach(function(i){i.onchange=function(){
+  var f=state.fasi.find(function(x){return x.id===i.closest('tr').dataset.id});
+  f[i.dataset.k]=(i.type==='range'||i.type==='number')?+i.value:i.value;save();renderAll()}});
+ el.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){
+  ask('Eliminare la fase? Le spese collegate resteranno senza fase.',function(){state.fasi=state.fasi.filter(function(x){return x.id!==b.dataset.del});save();renderAll()})}});
+ document.getElementById('addf').onclick=function(){state.fasi.push({id:uid(),nome:'Nuova fase',perc:0,inizio:'',fine:'',budget:0});save();renderAll()};
+}
+function renderS(){
+ var list=state.spese.filter(function(s){return filt==='all'||(filt==='p'?s.pagata:!s.pagata)}).sort(function(a,b){return (a.data||'').localeCompare(b.data||'')});
+ var opts=function(sel){return '<option value="">—</option>'+state.fasi.map(function(f){return '<option value="'+f.id+'"'+(f.id===sel?' selected':'')+'>'+esc(f.nome)+'</option>'}).join('')};
+ var seg=function(k,t){return '<button class="btn'+(filt===k?' pri':'')+'" data-f="'+k+'">'+t+'</button>'};
+ var h='<div class="card scroll"><div class="seg">'+seg('all','Tutte')+seg('p','Pagate')+seg('d','Previste')+'</div><table><tr><th style="width:140px">Data</th><th>Fase</th><th>Voce / fornitore</th><th style="min-width:200px">Dettagli</th><th style="width:120px">Importo (€)</th><th>Pagata</th><th></th></tr>';
+ list.forEach(function(s){
+  h+='<tr data-id="'+s.id+'"><td><input type="date" data-k="data" value="'+esc(s.data)+'"></td>'+
+  '<td><select data-k="fase">'+opts(s.fase)+'</select></td>'+
+  '<td><input data-k="voce" value="'+esc(s.voce)+'"></td>'+
+  '<td><input data-k="dettagli" value="'+esc(s.dettagli)+'" placeholder="Note, fattura, fornitore…"></td>'+
+  '<td><input type="number" data-k="importo" step="0.01" value="'+(+s.importo||'')+'"></td>'+
+  '<td><input type="checkbox" data-k="pagata"'+(s.pagata?' checked':'')+'></td>'+
+  '<td><button class="x" data-del="'+s.id+'" title="Elimina">×</button></td></tr>';
+ });
+ h+='</table><p><button class="btn pri" id="adds">+ Aggiungi spesa</button> <span class="sub">Pagato: <b>'+fmt.format(pagato())+'</b> · Previsto: <b>'+fmt.format(stima()-pagato())+'</b> · Totale: <b>'+fmt.format(stima())+'</b></span></p></div>';
+ var el=document.getElementById('s');el.innerHTML=h;
+ el.querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){filt=b.dataset.f;renderS()}});
+ el.querySelectorAll('tr[data-id] [data-k]').forEach(function(i){i.onchange=function(){
+  var s=state.spese.find(function(x){return x.id===i.closest('tr').dataset.id});
+  s[i.dataset.k]=i.type==='checkbox'?i.checked:i.type==='number'?+i.value:i.value;save();renderAll()}});
+ el.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){
+  ask('Eliminare questa spesa?',function(){state.spese=state.spese.filter(function(x){return x.id!==b.dataset.del});save();renderAll()})}});
+ document.getElementById('adds').onclick=function(){state.spese.push({id:uid(),data:new Date().toISOString().slice(0,10),fase:'',voce:'',dettagli:'',importo:0,pagata:false});save();renderAll()};
+}
+function renderE(){
+ var list=state.entrate.slice().sort(function(a,b){return (a.data||'').localeCompare(b.data||'')});
+ var by={};state.entrate.forEach(function(e){by[e.fonte]=(by[e.fonte]||0)+(+e.importo||0)});
+ var h='<div class="card scroll"><table><tr><th style="width:140px">Data</th><th>Fonte</th><th style="width:140px">Importo (€)</th><th></th></tr>';
+ list.forEach(function(e){
+  h+='<tr data-id="'+e.id+'"><td><input type="date" data-k="data" value="'+esc(e.data)+'"></td><td><input data-k="fonte" value="'+esc(e.fonte)+'"></td>'+
+  '<td><input type="number" data-k="importo" value="'+(+e.importo||'')+'"></td><td><button class="x" data-del="'+e.id+'">×</button></td></tr>';
+ });
+ h+='</table><p><button class="btn pri" id="adde">+ Aggiungi entrata</button> <span class="sub">'+Object.keys(by).map(function(k){return esc(k)+': <b>'+fmt.format(by[k])+'</b>'}).join(' · ')+'</span></p></div>';
+ var el=document.getElementById('e');el.innerHTML=h;
+ el.querySelectorAll('tr[data-id] [data-k]').forEach(function(i){i.onchange=function(){
+  var e=state.entrate.find(function(x){return x.id===i.closest('tr').dataset.id});
+  e[i.dataset.k]=i.type==='number'?+i.value:i.value;save();renderAll()}});
+ el.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){ask('Eliminare questa entrata?',function(){state.entrate=state.entrate.filter(function(x){return x.id!==b.dataset.del});save();renderAll()})}});
+ document.getElementById('adde').onclick=function(){state.entrate.push({id:uid(),data:new Date().toISOString().slice(0,10),fonte:'',importo:0});save();renderAll()};
+}
+function cImp(c){return +c.importo||0}
+function parseImp(t){
+ t=String(t).replace(/[^\d,.\-]/g,'');
+ if(!t)return '';
+ if(t.indexOf(',')>=0)t=t.replace(/\./g,'').replace(',','.');
+ else if(/^-?\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,'');
+ var n=parseFloat(t);return isNaN(n)?'':n;
+}
+function computoFase(id){return sum(state.computi.filter(function(c){return c.fase===id}),cImp)}
+function computoVoce(id,v){return sum(state.computi.filter(function(c){return c.fase===id&&c.voce===v}),cImp)}
+function computoTot(){return sum(state.computi,cImp)}
+function computoKpi(E){
+ var ct=computoTot();
+ if(!ct)return kcard('Costo da computo','—','inserisci le voci in “Computi metrici”');
+ var d=E-ct;
+ return kcard('Costo da computo',fmt.format(ct),'spese pianificate '+fmt.format(E)+' · scarto '+(d>0?'+':'')+fmt.format(d),d>0?'neg':'');
+}
+var filtC='all';
+function renderC(){
+ var fi={};state.fasi.forEach(function(f,i){fi[f.id]=i});
+ var list=state.computi.filter(function(c){return filtC==='all'||(filtC==='p'?c.pagata:!c.pagata)}).sort(function(a,b){return (fi[a.fase]==null?999:fi[a.fase])-(fi[b.fase]==null?999:fi[b.fase])});
+ var voci=[];state.spese.forEach(function(s){if(s.voce&&voci.indexOf(s.voce)<0)voci.push(s.voce)});
+ var opts=function(sel){return '<option value="">—</option>'+state.fasi.map(function(f){return '<option value="'+f.id+'"'+(f.id===sel?' selected':'')+'>'+esc(f.nome)+'</option>'}).join('')};
+ var seg=function(k,t){return '<button class="btn'+(filtC===k?' pri':'')+'" data-f="'+k+'">'+t+'</button>'};
+ var ct=computoTot(),et=stima();
+ var h='<datalist id="vl">'+voci.map(function(v){return '<option value="'+esc(v)+'">'}).join('')+'</datalist>'+
+ '<div class="card scroll"><div class="seg">'+seg('all','Tutte')+seg('p','Pagate')+seg('d','Previste')+'</div><table><tr><th>Fase</th><th>Voce / fornitore</th><th style="min-width:200px">Dettagli</th><th style="width:120px">Importo (€)</th><th>Pagata</th><th></th></tr>';
+ list.forEach(function(c){
+  var d=c.dettagli!=null?c.dettagli:(c.desc||'');
+  h+='<tr data-id="'+c.id+'"><td><select data-k="fase">'+opts(c.fase)+'</select></td>'+
+  '<td><input data-k="voce" list="vl" value="'+esc(c.voce)+'"></td>'+
+  '<td><input data-k="dettagli" value="'+esc(d)+'" placeholder="Note, fattura, fornitore…"></td>'+
+  '<td><input data-k="importo" inputmode="decimal" value="'+(+c.importo||'')+'"></td>'+
+  '<td><input type="checkbox" data-k="pagata"'+(c.pagata?' checked':'')+'></td>'+
+  '<td><button class="x" data-del="'+c.id+'" title="Elimina">×</button></td></tr>';
+ });
+ h+='</table><p><button class="btn pri" id="addc">+ Aggiungi voce di computo</button> <span class="sub">Totale computo: <b>'+fmt.format(ct)+'</b> · Spese pianificate: <b>'+fmt.format(et)+'</b> · Scarto: <b>'+(et-ct>0?'+':'')+fmt.format(et-ct)+'</b></span></p></div>';
+ var el=document.getElementById('c');el.innerHTML=h;
+ el.querySelectorAll('[data-f]').forEach(function(b){b.onclick=function(){filtC=b.dataset.f;renderC()}});
+ el.querySelectorAll('tr[data-id] [data-k]').forEach(function(i){i.onchange=function(){
+  var c=state.computi.find(function(x){return x.id===i.closest('tr').dataset.id});
+  c[i.dataset.k]=i.type==='checkbox'?i.checked:i.dataset.k==='importo'?parseImp(i.value):i.value;save();renderAll()}});
+ el.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){
+  ask('Eliminare questa voce di computo?',function(){state.computi=state.computi.filter(function(x){return x.id!==b.dataset.del});save();renderAll()})}});
+ document.getElementById('addc').onclick=function(){
+  var last=state.computi[state.computi.length-1];
+  state.computi.push({id:uid(),fase:last?last.fase:'',voce:'',dettagli:'',importo:0,pagata:false});save();renderAll()};
+}
+function renderAll(){renderP();renderF();renderC();renderS();renderE()}
+document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){
+ document.querySelectorAll('nav button').forEach(function(x){x.classList.toggle('on',x===b)});
+ ['p','f','c','s','e'].forEach(function(id){document.getElementById(id).classList.toggle('hide',id!==b.dataset.t)})}});
+document.getElementById('rst').onclick=function(){
+ ask('Ripristinare i dati originali importati dal file Excel? Le modifiche a fasi, spese ed entrate andranno perse (i computi metrici restano).',function(){var c=state.computi;state=JSON.parse(JSON.stringify(SEED));state.computi=c||[];save();renderAll()})};
+document.getElementById('exp').onclick=async function(){
+ var nf={};state.fasi.forEach(function(f){nf[f.id]=f.nome});
+ var csv='Data;Fase;Voce;Dettagli;Importo;Stato\n'+state.spese.map(function(s){return [s.data,nf[s.fase]||'',(s.voce||'').replace(/;/g,','),(s.dettagli||'').replace(/;/g,','),s.importo,s.pagata?'pagata':'prevista'].join(';')}).join('\n');
+ try{var d=await claude.use('downloads');if(d){await d.save({filename:'spese-cantiere.csv',data:csv})}}catch(e){}
+};
+renderAll();setSync('Dati dal tuo Excel · salvati su questo dispositivo');
+(async function(){
+ try{
+  if(!window.claude)return;
+  db=await claude.use('db');
+  if(!db)return;
+  var snap=await db.doc(DOC).get();
+  if(snap.exists){state=JSON.parse(JSON.stringify(snap.data()));if(!state.prev)state.prev=SEED.prev;if(!state.computi)state.computi=[];try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}renderAll()}
+  else{await db.doc(DOC).set(state)}
+  setSync('Sincronizzato');
+ }catch(e){db=null}
+})();
+</script>
+</body>
+</html>
